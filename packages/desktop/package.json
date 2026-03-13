@@ -8,6 +8,7 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "build:dmg": "electron-vite build && electron-builder --mac dmg",
+    "build:win": "electron-vite build && electron-builder --win nsis --x64",
     "preview": "electron-vite preview",
     "postinstall": "electron-builder install-app-deps"
   },
