@@ -85,8 +85,8 @@ export interface ClawWorkAPI {
   gatewayStatus: () => Promise<ConnectionStatus>;
   syncSessions: () => Promise<SyncResult>;
 
-  onGatewayEvent: (callback: (data: GatewayEvent) => void) => void;
-  onGatewayStatus: (callback: (status: ConnectionStatus) => void) => void;
+  onGatewayEvent: (callback: (data: GatewayEvent) => void) => (() => void);
+  onGatewayStatus: (callback: (status: ConnectionStatus) => void) => (() => void);
   removeAllListeners: (channel: string) => void;
 
   loadTasks: () => Promise<ListResult<PersistedTask>>;

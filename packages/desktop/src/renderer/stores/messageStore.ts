@@ -79,14 +79,40 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     })),
 
   finalizeStream: (taskId) => {
-    const content = get().streamingByTask[taskId];
-    if (!content) return;
-    get().addMessage(taskId, 'assistant', content);
+    let captured: Message | null = null;
     set((s) => {
-      const next = { ...s.streamingByTask };
-      delete next[taskId];
-      return { streamingByTask: next };
+      const content = s.streamingByTask[taskId];
+      if (!content) return s;
+      const msg: Message = {
+        id: generateId(),
+        taskId,
+        role: 'assistant',
+        content,
+        artifacts: [],
+        toolCalls: [],
+        timestamp: new Date().toISOString(),
+      };
+      captured = msg;
+      const nextStreaming = { ...s.streamingByTask };
+      delete nextStreaming[taskId];
+      return {
+        messagesByTask: {
+          ...s.messagesByTask,
+          [taskId]: [...(s.messagesByTask[taskId] ?? []), msg],
+        },
+        streamingByTask: nextStreaming,
+      };
     });
+    if (captured) {
+      const msg = captured as Message;
+      window.clawwork.persistMessage({
+        id: msg.id,
+        taskId: msg.taskId,
+        role: msg.role,
+        content: msg.content,
+        timestamp: msg.timestamp,
+      }).catch(() => {});
+    }
   },
 
   clearMessages: (taskId) =>

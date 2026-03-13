@@ -43,12 +43,9 @@ interface AgentToolEvent {
  * Mount once at App root level.
  */
 export function useGatewayEventDispatcher(): void {
-  const addMessage = useMessageStore((s) => s.addMessage);
-  const appendStreamDelta = useMessageStore((s) => s.appendStreamDelta);
-  const finalizeStream = useMessageStore((s) => s.finalizeStream);
   const activeTaskId = useTaskStore((s) => s.activeTaskId);
-  const updateTaskTitle = useTaskStore((s) => s.updateTaskTitle);
-  const markUnread = useUiStore((s) => s.markUnread);
+  const activeTaskIdRef = useRef(activeTaskId);
+  activeTaskIdRef.current = activeTaskId;
 
   useEffect(() => {
     const handler = (data: { event: string; payload: Record<string, unknown> }): void => {
@@ -66,26 +63,28 @@ export function useGatewayEventDispatcher(): void {
       const taskId = parseTaskIdFromSessionKey(sessionKey);
       if (!taskId) return;
 
-      if (taskId !== activeTaskId) {
-        markUnread(taskId);
+      if (taskId !== activeTaskIdRef.current) {
+        useUiStore.getState().markUnread(taskId);
       }
+
+      const store = useMessageStore.getState();
 
       if (state === 'delta') {
         const text = extractText(payload);
         if (text) {
-          useMessageStore.getState().setProcessing(taskId, false);
-          appendStreamDelta(taskId, text);
+          store.setProcessing(taskId, false);
+          store.appendStreamDelta(taskId, text);
         }
       } else if (state === 'final') {
-        useMessageStore.getState().setProcessing(taskId, false);
-        finalizeStream(taskId);
-        autoTitleIfNeeded(taskId, updateTaskTitle);
+        store.setProcessing(taskId, false);
+        store.finalizeStream(taskId);
+        autoTitleIfNeeded(taskId);
       } else if (state === 'error' || state === 'aborted') {
-        useMessageStore.getState().setProcessing(taskId, false);
-        finalizeStream(taskId);
+        store.setProcessing(taskId, false);
+        store.finalizeStream(taskId);
         if (state === 'error') {
           const errText = extractText(payload) || '请求出错';
-          addMessage(taskId, 'system', errText);
+          store.addMessage(taskId, 'system', errText);
         }
       }
     }
@@ -97,21 +96,17 @@ export function useGatewayEventDispatcher(): void {
       const taskId = parseTaskIdFromSessionKey(sessionKey);
       if (!taskId) return;
 
-      if (taskId !== activeTaskId) {
-        markUnread(taskId);
+      if (taskId !== activeTaskIdRef.current) {
+        useUiStore.getState().markUnread(taskId);
       }
 
       const toolText = formatToolEvent(tool);
-      if (tool.status === 'running') {
-        addMessage(taskId, 'system', toolText);
-      }
+      useMessageStore.getState().addMessage(taskId, 'system', toolText);
     }
 
-    window.clawwork.onGatewayEvent(handler);
-    return () => {
-      window.clawwork.removeAllListeners('gateway-event');
-    };
-  }, [activeTaskId, addMessage, appendStreamDelta, finalizeStream, markUnread, updateTaskTitle]);
+    const removeGatewayEvent = window.clawwork.onGatewayEvent(handler);
+    return removeGatewayEvent;
+  }, []);
 
   // Hydrate tasks + messages from local SQLite on mount
   useEffect(() => {
@@ -131,7 +126,7 @@ export function useGatewayEventDispatcher(): void {
         syncFromGateway();
       }
     });
-    window.clawwork.onGatewayStatus((s) => {
+    const removeGatewayStatus = window.clawwork.onGatewayStatus((s) => {
       const next = s.connected ? 'connected' as const : s.error ? 'disconnected' as const : 'connecting' as const;
       setGwStatus(next);
       if (s.connected && !wasConnectedRef.current) {
@@ -145,7 +140,7 @@ export function useGatewayEventDispatcher(): void {
       }
       wasConnectedRef.current = s.connected;
     });
-    return () => { window.clawwork.removeAllListeners('gateway-status'); };
+    return removeGatewayStatus;
   }, []);
 }
 
@@ -165,11 +160,9 @@ function formatToolEvent(tool: { name: string; status: string; args?: string; re
   return `${prefix} \`${tool.name}\` — ${tool.status}`;
 }
 
-function autoTitleIfNeeded(
-  taskId: string,
-  updateTaskTitle: (id: string, title: string) => void,
-): void {
-  const task = useTaskStore.getState().tasks.find((t) => t.id === taskId);
+function autoTitleIfNeeded(taskId: string): void {
+  const { tasks, updateTaskTitle } = useTaskStore.getState();
+  const task = tasks.find((t) => t.id === taskId);
   if (task && !task.title) {
     const msgs = useMessageStore.getState().messagesByTask[taskId] ?? [];
     const firstAssistant = msgs.find((m) => m.role === 'assistant');

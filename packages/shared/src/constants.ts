@@ -7,6 +7,7 @@ export const GATEWAY_WS_PORT = 18789;
 
 /** ClawWork session key prefix: agent:main:clawwork:task: */
 export const SESSION_KEY_PREFIX = 'agent:main:clawwork:task:';
+const LEGACY_SESSION_KEY_RE = /^agent:[^:]+:task-(.+)$/;
 
 /** Build a session key from taskId (fixed to main agent) */
 export function buildSessionKey(taskId: string): string {
@@ -15,8 +16,13 @@ export function buildSessionKey(taskId: string): string {
 
 /** Extract taskId from a ClawWork session key */
 export function parseTaskIdFromSessionKey(sessionKey: string): string | null {
-  if (!sessionKey.startsWith(SESSION_KEY_PREFIX)) return null;
-  return sessionKey.slice(SESSION_KEY_PREFIX.length) || null;
+  if (sessionKey.startsWith(SESSION_KEY_PREFIX)) {
+    return sessionKey.slice(SESSION_KEY_PREFIX.length) || null;
+  }
+
+  // Keep old task sessions renderable after the gateway-only key migration.
+  const legacyMatch = sessionKey.match(LEGACY_SESSION_KEY_RE);
+  return legacyMatch ? legacyMatch[1] : null;
 }
 
 /** Check if a session key belongs to ClawWork */

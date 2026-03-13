@@ -81,26 +81,31 @@ export const useTaskStore = create<TaskState>((set, get) => ({
   },
 
   adoptTasks: (discovered) => {
-    const existing = new Set(get().tasks.map((t) => t.id));
-    const newTasks: Task[] = [];
-    for (const d of discovered) {
-      if (existing.has(d.taskId)) continue;
-      const task: Task = {
-        id: d.taskId,
-        sessionKey: d.sessionKey,
-        sessionId: '',
-        title: d.title,
-        status: 'active',
-        createdAt: d.updatedAt,
-        updatedAt: d.updatedAt,
-        tags: [],
-        artifactDir: '',
-      };
-      newTasks.push(task);
+    const toPersist: Task[] = [];
+    set((s) => {
+      const existing = new Set(s.tasks.map((t) => t.id));
+      const newTasks: Task[] = [];
+      for (const d of discovered) {
+        if (existing.has(d.taskId)) continue;
+        const task: Task = {
+          id: d.taskId,
+          sessionKey: d.sessionKey,
+          sessionId: '',
+          title: d.title,
+          status: 'active',
+          createdAt: d.updatedAt,
+          updatedAt: d.updatedAt,
+          tags: [],
+          artifactDir: '',
+        };
+        newTasks.push(task);
+      }
+      if (newTasks.length === 0) return s;
+      toPersist.push(...newTasks);
+      return { tasks: [...newTasks, ...s.tasks] };
+    });
+    for (const task of toPersist) {
       window.clawwork.persistTask(task).catch(() => {});
-    }
-    if (newTasks.length > 0) {
-      set((s) => ({ tasks: [...newTasks, ...s.tasks] }));
     }
   },
 }));

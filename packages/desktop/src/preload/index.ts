@@ -16,10 +16,18 @@ function buildApi(): ClawWorkAPI {
       ipcRenderer.invoke('ws:sync-sessions'),
 
     onGatewayEvent: (callback) => {
-      ipcRenderer.on('gateway-event', (_event, data) => callback(data));
+      const listener = (_event: Electron.IpcRendererEvent, data: unknown): void => {
+        callback(data as { event: string; payload: Record<string, unknown> });
+      };
+      ipcRenderer.on('gateway-event', listener);
+      return () => { ipcRenderer.removeListener('gateway-event', listener); };
     },
     onGatewayStatus: (callback) => {
-      ipcRenderer.on('gateway-status', (_event, status) => callback(status));
+      const listener = (_event: Electron.IpcRendererEvent, status: unknown): void => {
+        callback(status as { connected: boolean; error?: string });
+      };
+      ipcRenderer.on('gateway-status', listener);
+      return () => { ipcRenderer.removeListener('gateway-status', listener); };
     },
 
     loadTasks: () =>

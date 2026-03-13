@@ -139,7 +139,7 @@ pnpm --filter @clawwork/desktop build
 ### Session Key 格式
 
 ```
-agent:<agentId>:task-<taskId>
+agent:main:clawwork:task:<taskId>
 ```
 
 每个 Task 对应一个独立的 OpenClaw session。session 间并行执行，session 内串行。Gateway 广播所有 session 事件（不过滤），客户端按 sessionKey 路由到对应 Task。
