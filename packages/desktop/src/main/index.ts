@@ -86,7 +86,7 @@ function createWindow(): BrowserWindow {
 }
 
 app.whenReady().then(() => {
-  initDebugLogger(join(app.getPath('userData'), 'debug'));
+  initDebugLogger(app.getPath('logs'));
   getDebugLogger().info({ domain: 'app', event: 'app.start', data: { userData: app.getPath('userData') } });
   electronApp.setAppUserModelId('com.clawwork.app');
 

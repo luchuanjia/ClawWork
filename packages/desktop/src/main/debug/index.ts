@@ -1,13 +1,18 @@
 import { BrowserWindow } from 'electron';
-import { join } from 'node:path';
 import type { DebugEvent } from '@clawwork/shared';
 import type { DebugLogger } from './logger.js';
 import { createDebugLogger } from './logger.js';
 
-let debugLogger: DebugLogger = createDebugLogger({
-  debugDir: join(process.cwd(), '.clawwork-debug'),
-  console: true,
-});
+const noop = (): DebugEvent => ({ ts: '', level: 'debug', domain: 'app', event: '' } as DebugEvent);
+let debugLogger: DebugLogger = {
+  debug: noop,
+  info: noop,
+  warn: noop,
+  error: noop,
+  log: noop,
+  getRecentEvents: () => [],
+  currentFilePath: () => '',
+};
 
 export function initDebugLogger(debugDir: string): DebugLogger {
   debugLogger = createDebugLogger({

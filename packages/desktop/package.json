@@ -1,6 +1,6 @@
 {
   "name": "@clawwork/desktop",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": true,
   "description": "OpenClaw desktop client with structured task management",
   "type": "module",
@@ -13,12 +13,8 @@
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
-    "build:mac": "electron-vite build && electron-builder --mac",
-    "build:win": "electron-vite build && electron-builder --win",
-    "build:mac:arm64": "electron-vite build && electron-builder --mac --arm64",
-    "build:mac:x64": "electron-vite build && electron-builder --mac --x64",
-    "build:mac:universal": "electron-vite build && electron-builder --mac --universal",
-    "build:win:x64": "electron-vite build && electron-builder --win --x64",
+    "build:mac": "electron-vite build && electron-builder --mac --universal",
+    "build:win": "electron-vite build && electron-builder --win --x64",
     "preview": "electron-vite preview",
     "test": "vitest run",
     "test:watch": "vitest",

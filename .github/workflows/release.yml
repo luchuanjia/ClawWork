@@ -4,9 +4,16 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v1.0.0)'
+        required: true
+        type: string
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   release:
@@ -21,6 +28,8 @@ jobs:
             build_args: "--win --x64"
 
     runs-on: ${{ matrix.os }}
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
     defaults:
       run:
         shell: bash
@@ -28,11 +37,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
 
       - name: Verify tag/version consistency
         run: |
           DESKTOP_VERSION=$(node -p "require('./packages/desktop/package.json').version")
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          TAG_VERSION="${RELEASE_TAG#v}"
           if [ "$DESKTOP_VERSION" != "$TAG_VERSION" ]; then
             echo "::error::Version mismatch: package.json=${DESKTOP_VERSION}, tag=${TAG_VERSION}"
             exit 1
@@ -57,7 +68,7 @@ jobs:
         run: pnpm --filter @clawwork/desktop build
 
       - name: Package (${{ matrix.platform }})
-        run: pnpm --filter @clawwork/desktop exec electron-builder ${{ matrix.build_args }} -c.buildVersion=$BUILD_VERSION
+        run: pnpm --filter @clawwork/desktop exec electron-builder ${{ matrix.build_args }} -c.buildVersion="$BUILD_VERSION"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BUILD_VERSION: ${{ github.run_number }}
@@ -71,19 +82,21 @@ jobs:
             packages/desktop/dist/*.exe
             packages/desktop/dist/*.blockmap
           draft: false
-          prerelease: ${{ contains(github.ref, '-rc') || contains(github.ref, '-beta') || contains(github.ref, '-alpha') }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          prerelease: ${{ contains(env.RELEASE_TAG, '-rc') || contains(env.RELEASE_TAG, '-beta') || contains(env.RELEASE_TAG, '-alpha') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   update-homebrew:
     needs: release
-    if: ${{ !contains(github.ref, '-rc') && !contains(github.ref, '-beta') && !contains(github.ref, '-alpha') }}
+    if: ${{ !contains(inputs.tag || github.ref_name, '-rc') && !contains(inputs.tag || github.ref_name, '-beta') && !contains(inputs.tag || github.ref_name, '-alpha') }}
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Homebrew tap update
         run: |
           gh workflow run update-homebrew.yml \
             --repo clawwork-ai/clawwork \
-            --field tag=${{ github.ref_name }}
+            --field tag="$RELEASE_TAG"
         env:
-          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
