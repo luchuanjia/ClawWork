@@ -141,7 +141,7 @@ export default function ApprovalDialog() {
             </Button>
             <Button
               onClick={() => resolveApproval(id, 'allow-once')}
-              style={{ background: 'var(--accent)', color: 'var(--bg-primary)' }}
+              style={{ background: 'var(--accent)', color: 'var(--accent-foreground)' }}
             >
               {t('approval.allowOnce')}
             </Button>
