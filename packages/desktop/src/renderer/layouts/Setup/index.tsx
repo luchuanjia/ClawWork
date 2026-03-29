@@ -21,12 +21,10 @@ export default function Setup({ onSetupComplete, initialStep = 'workspace' }: Se
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>(initialStep);
 
-  // Step 1: workspace
   const [path, setPath] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Step 2: gateway
   const [gwName, setGwName] = useState('Default Gateway');
   const [gwUrl, setGwUrl] = useState('ws://127.0.0.1:18789');
   const [gwAuthMode, setGwAuthMode] = useState<GatewayAuthMode>('token');
@@ -172,7 +170,6 @@ export default function Setup({ onSetupComplete, initialStep = 'workspace' }: Se
 
       <div className="flex flex-col items-center justify-center w-full px-6">
         <motion.div {...motionPresets.slideUp} className="w-full max-w-lg space-y-8">
-          {/* Logo + title */}
           <div className="flex flex-col items-center text-center space-y-3">
             <div className="relative">
               <div className="absolute inset-0 scale-[2.5] rounded-full bg-[var(--accent)] opacity-[0.06] blur-2xl" />
@@ -192,7 +189,6 @@ export default function Setup({ onSetupComplete, initialStep = 'workspace' }: Se
             </p>
           </div>
 
-          {/* Step indicator */}
           <div className="flex items-center justify-center gap-2">
             {(['workspace', 'gateway'] as const).map((s, i) => (
               <div key={s} className="flex items-center gap-2">
@@ -230,7 +226,6 @@ export default function Setup({ onSetupComplete, initialStep = 'workspace' }: Se
             ))}
           </div>
 
-          {/* Step content */}
           <AnimatePresence mode="wait">
             {step === 'workspace' ? (
               <motion.div

@@ -149,7 +149,6 @@ export class GatewayClient {
         reconnectAttempt: this.reconnectAttempts,
         maxAttempts: MAX_RECONNECT_ATTEMPTS,
       });
-      // Don't retry when server explicitly rejects (pairing required, auth denied)
       if (code === WS_CLOSE_POLICY_VIOLATION) return;
       this.scheduleReconnect();
     });

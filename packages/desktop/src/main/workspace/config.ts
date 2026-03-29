@@ -92,7 +92,6 @@ function migrateConfigIfNeeded(config: AppConfig): AppConfig {
     writeConfig(migrated);
     return migrated;
   }
-  // Ensure gateways array always exists
   if (!config.gateways) {
     config.gateways = [];
   }

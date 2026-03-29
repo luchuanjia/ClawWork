@@ -116,13 +116,10 @@ export function parseSlashQuery(
   value: string,
   selectionStart: number,
 ): { active: false } | { active: true; query: string } {
-  // Only consider text up to cursor
   const before = value.slice(0, selectionStart);
-  // Must be on the first line (no newlines before cursor)
   if (before.includes('\n')) return { active: false };
   if (!before.startsWith('/')) return { active: false };
   const afterSlash = before.slice(1);
-  // If there's already a space in the command name, we're in arg territory
   if (afterSlash.includes(' ')) return { active: false };
   return { active: true, query: afterSlash };
 }

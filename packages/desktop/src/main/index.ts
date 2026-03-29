@@ -27,7 +27,6 @@ import { initDatabase, closeDatabase } from './db/index.js';
 
 let isQuitting = false;
 
-// Prevent EPIPE crashes when stdout/stderr pipe is broken (common in dev mode)
 process.stdout?.on?.('error', () => {});
 process.stderr?.on?.('error', () => {});
 

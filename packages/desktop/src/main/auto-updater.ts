@@ -29,9 +29,7 @@ function broadcast(channel: string, data: unknown): void {
   for (const win of BrowserWindow.getAllWindows()) {
     try {
       win.webContents.send(channel, data);
-    } catch {
-      // window may be closing
-    }
+    } catch {}
   }
 }
 

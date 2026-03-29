@@ -1,8 +1,3 @@
-// ============================================================
-// Gateway WebSocket Protocol Types
-// JSON-RPC inspired frames: req, res, event
-// ============================================================
-
 import type { ApprovalDecision, ExecApprovalRequest, ExecApprovalResolved } from './types.js';
 
 export interface GatewayReqFrame {

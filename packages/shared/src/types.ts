@@ -1,27 +1,13 @@
-// ============================================================
-// ClawWork Core Types
-// Shared across ClawWork packages
-// ============================================================
-
-/** Task status lifecycle: active → completed → archived */
 export type TaskStatus = 'active' | 'completed' | 'archived';
 
-/** Message sender role */
 export type MessageRole = 'user' | 'assistant' | 'system';
 
-/** Artifact content type */
 export type ArtifactType = 'file' | 'code' | 'image' | 'link' | 'structured_data';
 
-/** Tool call execution status */
 export type ToolCallStatus = 'running' | 'done' | 'error';
-
-// ------------------------------------------------------------
-// Gateway Server Configuration
-// ------------------------------------------------------------
 
 import type { GatewayAuth } from './gateway-protocol.js';
 
-/** A configured OpenClaw Gateway server instance */
 export interface GatewayServer {
   id: string;
   name: string;
@@ -31,12 +17,7 @@ export interface GatewayServer {
   color?: string;
 }
 
-// Re-export GatewayAuth so consumers don't need a second import
 export type { GatewayAuth } from './gateway-protocol.js';
-
-// ------------------------------------------------------------
-// Core Entities
-// ------------------------------------------------------------
 
 export interface Task {
   id: string;
@@ -44,7 +25,7 @@ export interface Task {
   sessionId: string;
   title: string;
   status: TaskStatus;
-  createdAt: string; // ISO 8601
+  createdAt: string;
   updatedAt: string;
   tags: string[];
   artifactDir: string;
@@ -58,10 +39,8 @@ export interface Task {
   contextTokens?: number;
 }
 
-/** Image attachment stored with a user message for UI preview */
 export interface MessageImageAttachment {
   fileName: string;
-  /** data URL (e.g. "data:image/png;base64,...") for rendering in <img> */
   dataUrl: string;
 }
 
@@ -72,9 +51,8 @@ export interface Message {
   content: string;
   artifacts: Artifact[];
   toolCalls: ToolCall[];
-  /** Image attachments sent with user messages (for inline preview) */
   imageAttachments?: MessageImageAttachment[];
-  timestamp: string; // ISO 8601
+  timestamp: string;
   runId?: string;
   thinkingContent?: string;
 }
@@ -85,9 +63,7 @@ export interface Artifact {
   messageId: string;
   type: ArtifactType;
   name: string;
-  /** Original source path (e.g. from sendMedia) */
   filePath: string;
-  /** Relative path within workspace: <taskId>/<filename> */
   localPath: string;
   mimeType: string;
   size: number;
@@ -127,20 +103,11 @@ export interface IpcResult<T = unknown> {
   pairingRequired?: boolean;
 }
 
-// ------------------------------------------------------------
-// Chat Attachments (for Gateway chat.send)
-// ------------------------------------------------------------
-
-/** Image attachment sent via Gateway chat.send. Only image/* MIME types are supported. */
 export interface ChatAttachment {
-  mimeType: string; // e.g. "image/png", "image/jpeg"
+  mimeType: string;
   fileName: string;
-  content: string; // base64-encoded (no data URL prefix)
+  content: string;
 }
-
-// ------------------------------------------------------------
-// Gateway Agent / Model catalog
-// ------------------------------------------------------------
 
 export interface AgentIdentity {
   name?: string;
@@ -222,10 +189,6 @@ export interface ModelListResponse {
   models: ModelCatalogEntry[];
 }
 
-// ------------------------------------------------------------
-// Gateway Tools Catalog
-// ------------------------------------------------------------
-
 export interface ToolEntry {
   id: string;
   label: string;
@@ -262,14 +225,6 @@ export interface SessionPatchParams {
   label?: string | null;
 }
 
-// ------------------------------------------------------------
-// Exec Approval (operator.approvals scope)
-// ------------------------------------------------------------
-
-// ------------------------------------------------------------
-// File Context (@ file picker)
-// ------------------------------------------------------------
-
 export type FileTier = 'text' | 'image' | 'document' | 'unsupported';
 
 export interface FileIndexEntry {
@@ -289,10 +244,6 @@ export interface FileReadResult {
   truncated: boolean;
   tier: 'text' | 'image' | 'document';
 }
-
-// ------------------------------------------------------------
-// Exec Approval (operator.approvals scope)
-// ------------------------------------------------------------
 
 export type ApprovalDecision = 'allow-once' | 'allow-always' | 'deny';
 
@@ -355,10 +306,6 @@ export interface ExecApprovalResolved {
   ts?: number | null;
   request?: ExecApprovalRequestDetails | null;
 }
-
-// ------------------------------------------------------------
-// Usage & Cost (from Gateway usage.status / usage.cost)
-// ------------------------------------------------------------
 
 export type UsageProviderId =
   | 'anthropic'
@@ -448,10 +395,6 @@ export interface SessionsUsageResult {
   sessions: SessionUsageEntry[];
   totals: CostUsageTotals;
 }
-
-// ------------------------------------------------------------
-// Cron / Scheduled Tasks (Gateway cron.* RPCs)
-// ------------------------------------------------------------
 
 export type CronSchedule =
   | { kind: 'at'; at: string }

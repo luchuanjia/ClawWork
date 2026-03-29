@@ -11,9 +11,7 @@ export function useUpdateCheck(): void {
         if (result.hasUpdate) {
           setHasUpdate(true);
         }
-      } catch {
-        // silently ignore — no network or API failure
-      }
+      } catch {}
     }, 5000);
 
     return () => clearTimeout(timer);

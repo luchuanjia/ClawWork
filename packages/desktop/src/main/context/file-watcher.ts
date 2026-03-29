@@ -33,9 +33,7 @@ export function watchFolder(folderPath: string): void {
     });
 
     watchers.set(folderPath, watcher);
-  } catch {
-    //
-  }
+  } catch {}
 }
 
 export function unwatchFolder(folderPath: string): void {

@@ -75,9 +75,7 @@ export function loadOrCreateDeviceIdentity(filePath?: string): DeviceIdentity {
         return { deviceId: parsed.deviceId, publicKeyPem: parsed.publicKeyPem, privateKeyPem: parsed.privateKeyPem };
       }
     }
-  } catch {
-    // fall through to generate new identity
-  }
+  } catch {}
   const identity = generateIdentity();
   fs.mkdirSync(path.dirname(resolved), { recursive: true });
   const stored: StoredIdentity = {
@@ -184,8 +182,6 @@ export function buildDeviceConnectPayload(
   };
 }
 
-// --- Device token persistence (per-gateway) ---
-
 interface DeviceTokenStore {
   version: 1;
   tokens: Record<string, { token: string; role: string; issuedAtMs: number }>;
@@ -204,9 +200,7 @@ function readTokenStore(): DeviceTokenStore {
         return parsed;
       }
     }
-  } catch {
-    // corrupt file — start fresh
-  }
+  } catch {}
   return { version: 1, tokens: {} };
 }
 

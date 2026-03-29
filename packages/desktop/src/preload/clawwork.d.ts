@@ -207,7 +207,6 @@ interface ListResult<T> {
 type ChatAttachment = SharedChatAttachment;
 
 export interface ClawWorkAPI {
-  // Chat — all require gatewayId
   sendMessage: (
     gatewayId: string,
     sessionKey: string,
@@ -218,7 +217,6 @@ export interface ClawWorkAPI {
   listSessions: (gatewayId: string) => Promise<IpcResult>;
   abortChat: (gatewayId: string, sessionKey: string) => Promise<IpcResult>;
 
-  // Model / Agent / Session config
   listModels: (gatewayId: string) => Promise<IpcResult>;
   listAgents: (gatewayId: string) => Promise<IpcResult>;
   createAgent: (
@@ -242,12 +240,10 @@ export interface ClawWorkAPI {
   patchSession: (gatewayId: string, sessionKey: string, patch: Record<string, unknown>) => Promise<IpcResult>;
   getToolsCatalog: (gatewayId: string, agentId?: string) => Promise<IpcResult>;
 
-  // Gateway status — returns map of all gateways
   gatewayStatus: () => Promise<GatewayStatusMap>;
   syncSessions: () => Promise<SyncResult>;
   listGateways: () => Promise<GatewayListItem[]>;
 
-  // Push events from main process
   onGatewayEvent: (callback: (data: GatewayEvent) => void) => () => void;
   onGatewayStatus: (callback: (status: GatewayStatusEvent) => void) => () => void;
   onDebugEvent: (callback: (event: DebugEvent) => void) => () => void;
@@ -265,11 +261,9 @@ export interface ClawWorkAPI {
     data?: Record<string, unknown>;
   }) => void;
 
-  // Data persistence
   loadTasks: () => Promise<ListResult<PersistedTask>>;
   loadMessages: (taskId: string) => Promise<ListResult<PersistedMessage>>;
 
-  // Artifacts
   saveArtifact: (params: {
     taskId: string;
     sourcePath: string;
@@ -295,7 +289,6 @@ export interface ClawWorkAPI {
   exportSessionMarkdown: (taskId: string) => Promise<IpcResult>;
   exportSessionMarkdownAs: (taskId: string) => Promise<IpcResult>;
 
-  // Workspace
   openWorkspaceFolder: () => Promise<void>;
   isWorkspaceConfigured: () => Promise<boolean>;
   getWorkspacePath: () => Promise<string | null>;
@@ -304,7 +297,6 @@ export interface ClawWorkAPI {
   setupWorkspace: (path: string) => Promise<IpcResult>;
   changeWorkspace: (path: string) => Promise<IpcResult>;
 
-  // Settings
   getSettings: () => Promise<AppSettings | null>;
   updateSettings: (partial: Partial<AppSettings>) => Promise<{ ok: boolean; config: AppSettings }>;
   rebuildMenu: () => Promise<void>;
@@ -320,14 +312,12 @@ export interface ClawWorkAPI {
 
   reconnectGateway: (gatewayId: string) => Promise<IpcResult>;
 
-  // Gateway management
   addGateway: (gateway: GatewayServerConfig) => Promise<IpcResult>;
   removeGateway: (gatewayId: string) => Promise<IpcResult>;
   updateGateway: (gatewayId: string, partial: Partial<GatewayServerConfig>) => Promise<IpcResult>;
   setDefaultGateway: (gatewayId: string) => Promise<IpcResult>;
   testGateway: (url: string, auth: { token?: string; password?: string; pairingCode?: string }) => Promise<IpcResult>;
 
-  // Updates
   getAppVersion: () => Promise<string>;
   checkForUpdates: () => Promise<UpdateCheckResult>;
   downloadUpdate: () => Promise<{ ok: boolean; error?: string }>;
@@ -336,10 +326,8 @@ export interface ClawWorkAPI {
   onUpdateDownloaded: (callback: (info: UpdateDownloadedInfo) => void) => () => void;
   onUpdateError: (callback: (error: UpdateError) => void) => () => void;
 
-  // Search
   globalSearch: (query: string) => Promise<SearchResponse>;
 
-  // Task persistence
   persistTask: (task: {
     id: string;
     sessionKey: string;
