@@ -12,7 +12,7 @@ Parallel tasks, structured artifacts, scheduled automation — and files you can
 [![License](https://img.shields.io/github/license/clawwork-ai/clawwork?style=flat-square)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/clawwork-ai/clawwork?style=flat-square)](https://github.com/clawwork-ai/clawwork)
 
-[Download](#download) · [Quick start](#quick-start) · [What you get](#what-you-get) · [What it stores](#what-clawwork-stores) · [How it works](#how-it-works) · [Repo layout](#repo-layout) · [Roadmap](#roadmap) · [Contributing](#contributing) · [Keynote](https://clawwork-ai.github.io/ClawWork/keynote/)
+[Download](#download) · [**PWA**](https://cpwa.pages.dev) · [Quick start](#quick-start) · [What you get](#what-you-get) · [What it stores](#what-clawwork-stores) · [How it works](#how-it-works) · [Repo layout](#repo-layout) · [Roadmap](#roadmap) · [Contributing](#contributing) · [Keynote](https://clawwork-ai.github.io/ClawWork/keynote/)
 
 </div>
 
@@ -45,6 +45,10 @@ brew install --cask clawwork
 ### Releases
 
 Prebuilt macOS and Windows builds are available on the [Releases page](https://github.com/clawwork-ai/clawwork/releases/latest). The app updates itself — new versions download in the background and install when you quit.
+
+### PWA (browser)
+
+No install required — open **[cpwa.pages.dev](https://cpwa.pages.dev)** in any modern browser. Works on desktop and mobile, installable to your home screen. See [#206](https://github.com/clawwork-ai/ClawWork/issues/206) for details and feedback.
 
 ## Quick start
 
@@ -126,10 +130,12 @@ ClawWork talks to OpenClaw through a single Gateway WebSocket connection. Each t
 
 ```
 packages/shared/       — protocol types, constants (zero deps)
+packages/core/         — shared business logic: stores, services, ports
 packages/desktop/
   src/main/            — Electron main: gateway WS, IPC, DB, artifacts, OS integration
   src/preload/         — typed window.clawwork bridge
   src/renderer/        — React UI: components, layouts, stores, hooks, i18n
+packages/pwa/          — Progressive Web App (browser + mobile)
 website/               — project website (React + Vite)
 keynote/               — presentation slides (Slidev)
 ```
@@ -162,6 +168,7 @@ Electron 34, React 19, TypeScript, Tailwind CSS v4, Zustand, SQLite (Drizzle ORM
 - Auto-update
 - Tray, quick launch, and voice input
 - Gateway server version display
+- PWA with offline support and mobile UI ([cpwa.pages.dev](https://cpwa.pages.dev))
 
 🔮 Next up:
 
