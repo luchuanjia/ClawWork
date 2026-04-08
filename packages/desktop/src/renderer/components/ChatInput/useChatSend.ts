@@ -426,9 +426,7 @@ export function useChatSend(opts: UseChatSendOpts) {
   const handleModelQuickSend = useCallback(
     (modelId: string) => {
       if (!activeTask) {
-        useTaskStore.setState((s) => ({
-          pendingNewTask: s.pendingNewTask ? { ...s.pendingNewTask, model: modelId } : null,
-        }));
+        useTaskStore.getState().updatePending({ model: modelId });
         return;
       }
       const ta = textareaRef.current;
@@ -448,9 +446,7 @@ export function useChatSend(opts: UseChatSendOpts) {
   const handleThinkingQuickSend = useCallback(
     (level: ThinkingLevel) => {
       if (!activeTask) {
-        useTaskStore.setState((s) => ({
-          pendingNewTask: s.pendingNewTask ? { ...s.pendingNewTask, thinkingLevel: level } : null,
-        }));
+        useTaskStore.getState().updatePending({ thinkingLevel: level });
         return;
       }
       const ta = textareaRef.current;

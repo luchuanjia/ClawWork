@@ -99,9 +99,7 @@ export default function WelcomeScreen() {
         const prev = useTaskStore.getState().pendingNewTask;
         if (prev?.gatewayId === selectedGwId && prev?.agentId === effectiveAgentId && !prev?.ensemble && !prev?.teamId)
           return;
-        useTaskStore.setState({
-          pendingNewTask: { gatewayId: selectedGwId, agentId: effectiveAgentId },
-        });
+        useTaskStore.getState().setPending({ gatewayId: selectedGwId, agentId: effectiveAgentId });
       }
     } else if (activeTab === 'team' && selectedTeamId) {
       const team = teamsMap[selectedTeamId];
@@ -125,13 +123,11 @@ export default function WelcomeScreen() {
           prev?.teamId === selectedTeamId
         )
           return;
-        useTaskStore.setState({
-          pendingNewTask: {
-            gatewayId: team.gatewayId,
-            agentId,
-            ensemble: needsEnsemble,
-            teamId: selectedTeamId,
-          },
+        useTaskStore.getState().setPending({
+          gatewayId: team.gatewayId,
+          agentId,
+          ensemble: needsEnsemble,
+          teamId: selectedTeamId,
         });
       }
     } else if (activeTab === 'orchestrate') {
@@ -149,8 +145,10 @@ export default function WelcomeScreen() {
           !prev?.teamId
         )
           return;
-        useTaskStore.setState({
-          pendingNewTask: { gatewayId: selectedGwId, agentId: defaultAgent, ensemble: true },
+        useTaskStore.getState().setPending({
+          gatewayId: selectedGwId,
+          agentId: defaultAgent,
+          ensemble: true,
         });
       }
     }
