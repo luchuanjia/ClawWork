@@ -19,6 +19,13 @@ Parallel tasks, structured artifacts, scheduled automation — and files you can
 
 </div>
 
+> **⚠️ Official Repository**
+> This is the **official** ClawWork project: https://github.com/clawwork-ai/clawwork
+>
+> A copycat repository (ClawWorkAi/ClawWork) and website (clawworkai.store) have been found without proper attribution. Please be aware and use the official links above.
+>
+> Official Website: https://clawwork-ai.github.io/ClawWork/
+
 ## Why ClawWork
 
 OpenClaw is powerful. Plain chat is a bad container for the kind of work it can do.
