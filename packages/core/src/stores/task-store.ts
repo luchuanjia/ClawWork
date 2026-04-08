@@ -20,6 +20,8 @@ export interface TaskState {
   startNewTask: (opts?: Partial<PendingNewTask>) => void;
   commitPendingTask: () => Task;
   clearPending: () => void;
+  updatePending: (patch: Partial<PendingNewTask>) => void;
+  setPending: (task: PendingNewTask | null) => void;
   createTask: (opts?: { gatewayId?: string; agentId?: string; ensemble?: boolean; teamId?: string }) => Task;
   setActiveTask: (id: string | null) => void;
   updateTaskTitle: (id: string, title: string) => void;
@@ -142,6 +144,16 @@ export function createTaskStore(deps: TaskStoreDeps) {
     },
 
     clearPending: () => set({ pendingNewTask: null }),
+
+    updatePending: (patch) => {
+      const current = get().pendingNewTask;
+      if (!current) return;
+      set({ pendingNewTask: { ...current, ...patch } });
+    },
+
+    setPending: (task) => {
+      set({ pendingNewTask: task });
+    },
 
     createTask: (opts) => {
       const resolvedGatewayId = opts?.gatewayId ?? deps.getDefaultGatewayId() ?? '';
