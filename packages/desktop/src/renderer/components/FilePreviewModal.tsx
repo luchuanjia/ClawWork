@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, FileCode, Copy, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { copyTextToClipboard } from '@/lib/clipboard';
 import { motion as motionPresets, motionDuration } from '@/styles/design-tokens';
 
 interface FilePreviewModalProps {
@@ -31,7 +32,7 @@ export default function FilePreviewModal({ file, onClose }: FilePreviewModalProp
 
   const handleCopy = useCallback(() => {
     if (!file) return;
-    navigator.clipboard.writeText(file.content);
+    copyTextToClipboard(file.content).catch(console.error);
     setCopied(true);
   }, [file]);
 
