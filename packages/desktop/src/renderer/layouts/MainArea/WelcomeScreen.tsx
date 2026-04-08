@@ -1,3 +1,4 @@
+import { useGatewaySelector } from '../../hooks/useGatewaySelector';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Bot, ChevronDown, ChevronRight, Server, Sparkles, Users, Compass } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -43,17 +44,24 @@ export default function WelcomeScreen() {
   const loadTeams = useTeamStore((s) => s.loadTeams);
 
   const gateways = useMemo(() => Object.values(gatewayInfoMap), [gatewayInfoMap]);
-  const hasMultipleGw = gateways.length > 1;
   const teams = useMemo(() => Object.values(teamsMap), [teamsMap]);
   const hasTeams = teams.length > 0;
 
-  const [selectedGwId, setSelectedGwId] = useState(
-    pendingNewTask?.gatewayId ?? defaultGatewayId ?? gateways[0]?.id ?? '',
-  );
-
-  const gwAgents = agentCatalogByGateway[selectedGwId];
-  const agentCatalog = useMemo(() => gwAgents?.agents ?? [], [gwAgents]);
-  const hasMultipleAgents = agentCatalog.length > 1;
+  const {
+    selectedGwId,
+    setSelectedGwId,
+    agentCatalog,
+    effectiveAgentId,
+    setSelectedAgentId,
+    hasMultipleGw,
+    hasMultipleAgents,
+    gwAgents,
+  } = useGatewaySelector({
+    defaultGatewayId: pendingNewTask?.gatewayId ?? defaultGatewayId,
+    gateways,
+    fetchAgentsForGateway,
+    agentCatalogByGateway,
+  });
 
   const [activeTab, setActiveTab] = useState<WelcomeTab>(() => {
     const ensemble = activeTaskEnsemble ?? pendingNewTask?.ensemble;
@@ -62,32 +70,14 @@ export default function WelcomeScreen() {
     return hasTeams ? 'team' : 'agent';
   });
 
-  const initialAgentId =
-    pendingNewTask?.agentId ||
-    agentCatalogByGateway[pendingNewTask?.gatewayId ?? defaultGatewayId ?? '']?.defaultId ||
-    '';
-  const [selectedAgentId, setSelectedAgentId] = useState(initialAgentId);
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(
     pendingNewTask?.teamId ?? activeTaskTeamId ?? null,
   );
   const [agentExpanded, setAgentExpanded] = useState(false);
 
-  const effectiveAgentId = selectedAgentId || gwAgents?.defaultId || '';
-
   useEffect(() => {
     loadTeams();
   }, [loadTeams]);
-
-  useEffect(() => {
-    if (!selectedGwId) {
-      const fallback = defaultGatewayId ?? gateways[0]?.id ?? '';
-      if (fallback) setSelectedGwId(fallback);
-    }
-  }, [defaultGatewayId, gateways, selectedGwId]);
-
-  useEffect(() => {
-    if (selectedGwId) fetchAgentsForGateway(selectedGwId);
-  }, [selectedGwId]);
 
   useEffect(() => {
     if (activeTab === 'agent') {
