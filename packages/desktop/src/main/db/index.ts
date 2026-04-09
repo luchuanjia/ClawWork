@@ -15,7 +15,7 @@ function migrateAddColumn(database: Database.Database, sql: string): void {
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
     if (!msg.includes('duplicate column')) {
-      console.error('[db:migration]', msg);
+      console.error(`[db] migration failed for "${sql}":`, msg);
     }
   }
 }
